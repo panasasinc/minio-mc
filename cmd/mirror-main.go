@@ -294,7 +294,7 @@ func (mj *mirrorJob) doCreateBucket(ctx context.Context, sURLs URLs) URLs {
 		return sURLs.WithError(pErr)
 	}
 
-	err := clnt.MakeBucket(ctx, "", mj.opts.isOverwrite, false)
+	err := clnt.MakeBucket(ctx, "", "", mj.opts.isOverwrite, false)
 	if err != nil {
 		return sURLs.WithError(err)
 	}
@@ -962,7 +962,7 @@ func runMirror(ctx context.Context, cancelMirror context.CancelFunc, srcURL, dst
 				}
 
 				// Bucket only exists in the source, create the same bucket in the destination
-				if err := newDstClt.MakeBucket(ctx, cli.String("region"), false, withLock); err != nil {
+				if err := newDstClt.MakeBucket(ctx, cli.String("region"), "", false, withLock); err != nil {
 					errorIf(err, "Unable to create bucket at `"+newTgtURL+"`.")
 					continue
 				}
