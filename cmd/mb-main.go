@@ -36,7 +36,7 @@ var mbFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "panfs-path",
 		Value: "",
-		Usage: "specify path to bucket in panfs; defaults empty string means that global volume will be used as root for bucket",
+		Usage: "specify path to bucket in PanFS; defaults to empty string that means that default path will be used",
 	},
 	cli.BoolFlag{
 		Name:  "ignore-existing, p",
