@@ -103,7 +103,7 @@ type Client interface {
 	List(ctx context.Context, opts ListOptions) <-chan *ClientContent
 
 	// Bucket operations
-	MakeBucket(ctx context.Context, region string, panfsPath string, ignoreExisting, withLock bool) *probe.Error
+	MakeBucket(ctx context.Context, region string, panFSPath string, ignoreExisting, withLock bool) *probe.Error
 	RemoveBucket(ctx context.Context, forceRemove bool) *probe.Error
 
 	// Object lock config

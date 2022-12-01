@@ -1346,7 +1346,7 @@ func (c *S3Client) Remove(ctx context.Context, isIncomplete, isRemoveBucket, isB
 }
 
 // MakeBucket - make a new bucket.
-func (c *S3Client) MakeBucket(ctx context.Context, region string, panfsPath string, ignoreExisting, withLock bool) *probe.Error {
+func (c *S3Client) MakeBucket(ctx context.Context, region string, panFSPath string, ignoreExisting, withLock bool) *probe.Error {
 	bucket, object := c.url2BucketAndObject()
 	if bucket == "" {
 		return probe.NewError(BucketNameEmpty{})
@@ -1371,7 +1371,7 @@ func (c *S3Client) MakeBucket(ctx context.Context, region string, panfsPath stri
 			}
 			switch minio.ToErrorResponse(e).Code {
 			case "NoSuchBucket":
-				opts := minio.MakeBucketOptions{Region: region, PanfsPath: panfsPath, ObjectLocking: withLock}
+				opts := minio.MakeBucketOptions{Region: region, PanFSPath: panFSPath, ObjectLocking: withLock}
 				if e = c.api.MakeBucket(ctx, bucket, opts); e != nil {
 					return probe.NewError(e)
 				}
@@ -1383,7 +1383,7 @@ func (c *S3Client) MakeBucket(ctx context.Context, region string, panfsPath stri
 	}
 
 	var e error
-	opts := minio.MakeBucketOptions{Region: region, PanfsPath: panfsPath, ObjectLocking: withLock}
+	opts := minio.MakeBucketOptions{Region: region, PanFSPath: panFSPath, ObjectLocking: withLock}
 	if e = c.api.MakeBucket(ctx, bucket, opts); e != nil {
 		// Ignore bucket already existing error when ignoreExisting flag is enabled
 		if ignoreExisting {
@@ -2786,7 +2786,7 @@ func (c *S3Client) GetBucketInfo(ctx context.Context) (BucketInfo, *probe.Error)
 	b.Date = content.Time
 
 	if panfs, e := c.api.GetBucketPanfsPath(ctx, bucket); e == nil {
-		b.PanfsPath = panfs
+		b.PanFSPath = panfs
 	}
 
 	if vcfg, err := c.GetVersion(ctx); err == nil {
