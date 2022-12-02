@@ -284,7 +284,7 @@ type BucketInfo struct {
 		Enabled bool               `json:"enabled"`
 		Config  replication.Config `json:"config,omitempty"`
 	} `json:"Replication"`
-	PanFSPath string `json:FSPath"`
+	PanFSPath string `json:"panfspath"`
 	Policy    struct {
 		Type string `json:"type"`
 		Text string `json:"policy,omitempty"`
