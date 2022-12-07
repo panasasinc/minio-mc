@@ -117,4 +117,4 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
-replace github.com/minio/minio-go/v7 v7.0.41 => github.com/panasasinc/minio-go/v7 v7.0.441
+replace github.com/minio/minio-go/v7 v7.0.41 => github.com/panasasinc/minio-go/v7 v7.0.0-20221206164009-5985ee51debf
