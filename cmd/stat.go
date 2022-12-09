@@ -284,7 +284,8 @@ type BucketInfo struct {
 		Enabled bool               `json:"enabled"`
 		Config  replication.Config `json:"config,omitempty"`
 	} `json:"Replication"`
-	Policy struct {
+	PanFSPath string `json:"panfspath"`
+	Policy    struct {
 		Type string `json:"type"`
 		Text string `json:"policy,omitempty"`
 	} `json:"Policy,omitempty"`
@@ -415,6 +416,11 @@ func prettyPrintBucketMetadata(info BucketInfo) string {
 		fmt.Fprintf(&b, "%2s%s", placeHolder, "ILM: ")
 		fmt.Fprintf(&b, console.Colorize("Set", "Set"))
 		fmt.Fprintln(&b)
+	}
+
+	if info.PanFSPath != "" {
+		fmt.Fprintf(&b, "%2s%s", placeHolder, "PanFS path: ")
+		fmt.Fprintf(&b, fmt.Sprintf("%-10s\n", info.PanFSPath))
 	}
 
 	return b.String()

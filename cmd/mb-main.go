@@ -33,6 +33,10 @@ var mbFlags = []cli.Flag{
 		Value: "us-east-1",
 		Usage: "specify bucket region; defaults to 'us-east-1'",
 	},
+	cli.StringFlag{
+		Name:  "panfs-path",
+		Usage: "specify path to bucket in PanFS; by default will be used value configured on the server side",
+	},
 	cli.BoolFlag{
 		Name:  "ignore-existing, p",
 		Usage: "ignore if bucket/directory already exists",
@@ -130,6 +134,7 @@ func mainMakeBucket(cliCtx *cli.Context) error {
 	region := cliCtx.String("region")
 	ignoreExisting := cliCtx.Bool("p")
 	withLock := cliCtx.Bool("l")
+	panfsPath := cliCtx.String("panfs-path")
 
 	var cErr error
 	for _, targetURL := range cliCtx.Args() {
@@ -145,7 +150,7 @@ func mainMakeBucket(cliCtx *cli.Context) error {
 		defer cancelMakeBucket()
 
 		// Make bucket.
-		if err = clnt.MakeBucket(ctx, region, ignoreExisting, withLock); err != nil {
+		if err = clnt.MakeBucket(ctx, region, panfsPath, ignoreExisting, withLock); err != nil {
 			switch err.ToGoError().(type) {
 			case BucketNameEmpty:
 				errorIf(err.Trace(targetURL), "Unable to make bucket, please use `mc mb %s`.", urlJoinPath(targetURL, "your-bucket-name"))
