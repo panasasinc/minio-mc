@@ -56,7 +56,7 @@ FLAGS:
 EXAMPLES:
   1. Add a new user 'foobar' with id '123' and group '456' to MinIO server.
      {{.DisableHistory}}
-     {{.Prompt}} {{.HelpName}} myminio foobar foo12345 123 456
+     {{.Prompt}} {{.HelpName}} myminio foobar foo12345 "uid:123" "gid:456"
      {{.EnableHistory}}
 
   2. Add a new user 'foobar' to MinIO server, prompting for keys.
