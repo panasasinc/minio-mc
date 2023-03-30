@@ -76,6 +76,9 @@ func mainAdminUserInfo(ctx *cli.Context) error {
 		PolicyName: user.PolicyName,
 		UserStatus: string(user.Status),
 		MemberOf:   user.MemberOf,
+
+		MappedSysUser:  user.MappedSysUser,
+		MappedSysGroup: user.MappedSysGroup,
 	})
 
 	return nil

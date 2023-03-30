@@ -89,6 +89,9 @@ type userMessage struct {
 	PolicyName string   `json:"policyName,omitempty"`
 	UserStatus string   `json:"userStatus,omitempty"`
 	MemberOf   []string `json:"memberOf,omitempty"`
+
+	MappedSysUser  string `json:"sysUser,omitempty"`
+	MappedSysGroup string `json:"sysGroup,omitempty"`
 }
 
 func (u userMessage) String() string {
@@ -133,16 +136,18 @@ func (u userMessage) JSON() string {
 }
 
 // fetchUserKeys - returns the access and secret key
-func fetchUserKeys(args cli.Args) (string, string) {
+func fetchUserKeys(args cli.Args) (string, string, string, string) {
 	accessKey := ""
 	secretKey := ""
+	sysUser := ""
+	sysGroup := ""
 	console.SetColor(cred, color.New(color.FgYellow, color.Italic))
 	isTerminal := terminal.IsTerminal(int(os.Stdin.Fd()))
 	reader := bufio.NewReader(os.Stdin)
 
 	argCount := len(args)
 
-	if argCount == 1 {
+	if argCount < 2 {
 		if isTerminal {
 			fmt.Printf("%s", console.Colorize(cred, "Enter Access Key: "))
 		}
@@ -152,7 +157,7 @@ func fetchUserKeys(args cli.Args) (string, string) {
 		accessKey = args.Get(1)
 	}
 
-	if argCount == 1 || argCount == 2 {
+	if argCount < 3 {
 		if isTerminal {
 			fmt.Printf("%s", console.Colorize(cred, "Enter Secret Key: "))
 			bytePassword, _ := terminal.ReadPassword(int(os.Stdin.Fd()))
@@ -166,7 +171,27 @@ func fetchUserKeys(args cli.Args) (string, string) {
 		secretKey = args.Get(2)
 	}
 
-	return accessKey, secretKey
+	if argCount < 4 {
+		if isTerminal {
+			fmt.Printf("%s", console.Colorize(cred, "Enter Sys User: "))
+		}
+		value, _, _ := reader.ReadLine()
+		sysUser = string(value)
+	} else {
+		sysUser = args.Get(3)
+	}
+
+	if argCount < 5 {
+		if isTerminal {
+			fmt.Printf("%s", console.Colorize(cred, "Enter Sys Group: "))
+		}
+		value, _, _ := reader.ReadLine()
+		sysGroup = string(value)
+	} else {
+		sysGroup = args.Get(4)
+	}
+
+	return accessKey, secretKey, sysUser, sysGroup
 }
 
 // mainAdminUserAdd is the handle for "mc admin user add" command.
@@ -178,19 +203,22 @@ func mainAdminUserAdd(ctx *cli.Context) error {
 	// Get the alias parameter from cli
 	args := ctx.Args()
 	aliasedURL := args.Get(0)
-	accessKey, secretKey := fetchUserKeys(args)
+	accessKey, secretKey, sysUser, sysGroup := fetchUserKeys(args)
 
 	// Create a new MinIO Admin Client
 	client, err := newAdminClient(aliasedURL)
 	fatalIf(err, "Unable to initialize admin connection.")
 
-	fatalIf(probe.NewError(client.AddUser(globalContext, accessKey, secretKey)).Trace(args...), "Unable to add new user")
+	fatalIf(probe.NewError(client.AddUser(globalContext, accessKey, secretKey, sysUser, sysGroup)).Trace(args...), "Unable to add new user")
 
 	printMsg(userMessage{
 		op:         "add",
 		AccessKey:  accessKey,
 		SecretKey:  secretKey,
 		UserStatus: "enabled",
+
+		MappedSysUser:  sysUser,
+		MappedSysGroup: sysGroup,
 	})
 
 	return nil
