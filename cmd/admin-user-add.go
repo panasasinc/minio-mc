@@ -54,17 +54,19 @@ FLAGS:
   {{range .VisibleFlags}}{{.}}
   {{end}}
 EXAMPLES:
-  1. Add a new user 'foobar' to MinIO server.
+  1. Add a new user 'foobar' with id '123' and group '456' to MinIO server.
      {{.DisableHistory}}
-     {{.Prompt}} {{.HelpName}} myminio foobar foo12345
+     {{.Prompt}} {{.HelpName}} myminio foobar foo12345 123 456
      {{.EnableHistory}}
 
   2. Add a new user 'foobar' to MinIO server, prompting for keys.
+     There is no way to set user and group id.
      {{.Prompt}} {{.HelpName}} myminio
      Enter Access Key: foobar
      Enter Secret Key: foobar12345
 
   3. Add a new user 'foobar' to MinIO server using piped keys.
+     There is no way to set user and group id.
      {{.DisableHistory}}
      {{.Prompt}} echo -e "foobar\nfoobar12345" | {{.HelpName}} myminio
      {{.EnableHistory}}
@@ -135,8 +137,8 @@ func (u userMessage) JSON() string {
 	return string(jsonMessageBytes)
 }
 
-// fetchUserKeys - returns the access and secret key
-func fetchUserKeys(args cli.Args) (string, string, string, string) {
+// fetchUserParams - returns the access and secret key, user and group id
+func fetchUserParams(args cli.Args) (string, string, string, string) {
 	accessKey := ""
 	secretKey := ""
 	sysUser := ""
@@ -171,23 +173,11 @@ func fetchUserKeys(args cli.Args) (string, string, string, string) {
 		secretKey = args.Get(2)
 	}
 
-	if argCount < 4 {
-		if isTerminal {
-			fmt.Printf("%s", console.Colorize(cred, "Enter Sys User: "))
-		}
-		value, _, _ := reader.ReadLine()
-		sysUser = string(value)
-	} else {
+	if argCount >= 4 {
 		sysUser = args.Get(3)
 	}
 
-	if argCount < 5 {
-		if isTerminal {
-			fmt.Printf("%s", console.Colorize(cred, "Enter Sys Group: "))
-		}
-		value, _, _ := reader.ReadLine()
-		sysGroup = string(value)
-	} else {
+	if argCount >= 5 {
 		sysGroup = args.Get(4)
 	}
 
@@ -203,7 +193,7 @@ func mainAdminUserAdd(ctx *cli.Context) error {
 	// Get the alias parameter from cli
 	args := ctx.Args()
 	aliasedURL := args.Get(0)
-	accessKey, secretKey, sysUser, sysGroup := fetchUserKeys(args)
+	accessKey, secretKey, sysUser, sysGroup := fetchUserParams(args)
 
 	// Create a new MinIO Admin Client
 	client, err := newAdminClient(aliasedURL)
