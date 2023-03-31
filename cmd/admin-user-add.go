@@ -54,17 +54,19 @@ FLAGS:
   {{range .VisibleFlags}}{{.}}
   {{end}}
 EXAMPLES:
-  1. Add a new user 'foobar' to MinIO server.
+  1. Add a new user 'foobar' with id '123' and group '456' to MinIO server.
      {{.DisableHistory}}
-     {{.Prompt}} {{.HelpName}} myminio foobar foo12345
+     {{.Prompt}} {{.HelpName}} myminio foobar foo12345 "uid:123" "gid:456"
      {{.EnableHistory}}
 
   2. Add a new user 'foobar' to MinIO server, prompting for keys.
+     There is no way to set user and group id.
      {{.Prompt}} {{.HelpName}} myminio
      Enter Access Key: foobar
      Enter Secret Key: foobar12345
 
   3. Add a new user 'foobar' to MinIO server using piped keys.
+     There is no way to set user and group id.
      {{.DisableHistory}}
      {{.Prompt}} echo -e "foobar\nfoobar12345" | {{.HelpName}} myminio
      {{.EnableHistory}}
@@ -89,6 +91,9 @@ type userMessage struct {
 	PolicyName string   `json:"policyName,omitempty"`
 	UserStatus string   `json:"userStatus,omitempty"`
 	MemberOf   []string `json:"memberOf,omitempty"`
+
+	MappedSysUser  string `json:"sysUser,omitempty"`
+	MappedSysGroup string `json:"sysGroup,omitempty"`
 }
 
 func (u userMessage) String() string {
@@ -132,17 +137,19 @@ func (u userMessage) JSON() string {
 	return string(jsonMessageBytes)
 }
 
-// fetchUserKeys - returns the access and secret key
-func fetchUserKeys(args cli.Args) (string, string) {
+// fetchUserParams - returns the access and secret key, user and group id
+func fetchUserParams(args cli.Args) (string, string, string, string) {
 	accessKey := ""
 	secretKey := ""
+	sysUser := ""
+	sysGroup := ""
 	console.SetColor(cred, color.New(color.FgYellow, color.Italic))
 	isTerminal := terminal.IsTerminal(int(os.Stdin.Fd()))
 	reader := bufio.NewReader(os.Stdin)
 
 	argCount := len(args)
 
-	if argCount == 1 {
+	if argCount < 2 {
 		if isTerminal {
 			fmt.Printf("%s", console.Colorize(cred, "Enter Access Key: "))
 		}
@@ -152,7 +159,7 @@ func fetchUserKeys(args cli.Args) (string, string) {
 		accessKey = args.Get(1)
 	}
 
-	if argCount == 1 || argCount == 2 {
+	if argCount < 3 {
 		if isTerminal {
 			fmt.Printf("%s", console.Colorize(cred, "Enter Secret Key: "))
 			bytePassword, _ := terminal.ReadPassword(int(os.Stdin.Fd()))
@@ -166,7 +173,15 @@ func fetchUserKeys(args cli.Args) (string, string) {
 		secretKey = args.Get(2)
 	}
 
-	return accessKey, secretKey
+	if argCount >= 4 {
+		sysUser = args.Get(3)
+	}
+
+	if argCount >= 5 {
+		sysGroup = args.Get(4)
+	}
+
+	return accessKey, secretKey, sysUser, sysGroup
 }
 
 // mainAdminUserAdd is the handle for "mc admin user add" command.
@@ -178,19 +193,22 @@ func mainAdminUserAdd(ctx *cli.Context) error {
 	// Get the alias parameter from cli
 	args := ctx.Args()
 	aliasedURL := args.Get(0)
-	accessKey, secretKey := fetchUserKeys(args)
+	accessKey, secretKey, sysUser, sysGroup := fetchUserParams(args)
 
 	// Create a new MinIO Admin Client
 	client, err := newAdminClient(aliasedURL)
 	fatalIf(err, "Unable to initialize admin connection.")
 
-	fatalIf(probe.NewError(client.AddUser(globalContext, accessKey, secretKey)).Trace(args...), "Unable to add new user")
+	fatalIf(probe.NewError(client.AddUser(globalContext, accessKey, secretKey, sysUser, sysGroup)).Trace(args...), "Unable to add new user")
 
 	printMsg(userMessage{
 		op:         "add",
 		AccessKey:  accessKey,
 		SecretKey:  secretKey,
 		UserStatus: "enabled",
+
+		MappedSysUser:  sysUser,
+		MappedSysGroup: sysGroup,
 	})
 
 	return nil

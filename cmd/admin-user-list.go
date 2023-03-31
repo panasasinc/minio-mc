@@ -80,6 +80,9 @@ func mainAdminUserList(ctx *cli.Context) error {
 			AccessKey:  k,
 			PolicyName: v.PolicyName,
 			UserStatus: string(v.Status),
+
+			MappedSysUser:  v.MappedSysUser,
+			MappedSysGroup: v.MappedSysGroup,
 		})
 	}
 	return nil
