@@ -117,6 +117,8 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
+replace github.com/minio/pkg => github.com/panasasinc/minio-pkg v1.5.5-0.20230331124037-2837fe391278
+
 replace github.com/minio/minio-go/v7 v7.0.41 => github.com/panasasinc/minio-go/v7 v7.0.0-20221206164009-5985ee51debf
 
 replace github.com/minio/madmin-go => github.com/panasasinc/madmin-go v0.0.0-20230331061341-8fdaf3295741

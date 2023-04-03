@@ -501,8 +501,6 @@ github.com/minio/filepath v1.0.0 h1:fvkJu1+6X+ECRA6G3+JJETj4QeAYO9sV43I79H8ubDY=
 github.com/minio/filepath v1.0.0/go.mod h1:/nRZA2ldl5z6jT9/KQuvZcQlxZIMQoFFQPvEXx9T/Bw=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/pkg v1.5.4 h1:tP89j5EPym0C/kwacUm3NKgvpWEksDq2bVJJMQYLkmk=
-github.com/minio/pkg v1.5.4/go.mod h1:2MOaRFdmFKULD+uOLc3qHLGTQTuxCNPKNPfLBTxC8CA=
 github.com/minio/selfupdate v0.5.0 h1:0UH1HlL49+2XByhovKl5FpYTjKfvrQ2sgL1zEXK6mfI=
 github.com/minio/selfupdate v0.5.0/go.mod h1:mcDkzMgq8PRcpCRJo/NlPY7U45O5dfYl2Y0Rg7IustY=
 github.com/minio/sha256-simd v1.0.0 h1:v1ta+49hkWZyvaKwrQB8elexRqm6Y0aMLjCNsrYxo6g=
@@ -552,6 +550,8 @@ github.com/panasasinc/madmin-go v0.0.0-20230331061341-8fdaf3295741 h1:pg5zCBu0vh
 github.com/panasasinc/madmin-go v0.0.0-20230331061341-8fdaf3295741/go.mod h1:ATvkBOLiP3av4D++2v1UEHC/QzsGtgXD5kYvvRYzdKs=
 github.com/panasasinc/minio-go/v7 v7.0.0-20221206164009-5985ee51debf h1:H1tBUSBWU7Q4O4dpbJAaPKKu2lmpLEsFerl4XJ4xut0=
 github.com/panasasinc/minio-go/v7 v7.0.0-20221206164009-5985ee51debf/go.mod h1:nCrRzjoSUQh8hgKKtu3Y708OLvRLtuASMg2/nvmbarw=
+github.com/panasasinc/minio-pkg v1.5.5-0.20230331124037-2837fe391278 h1:Ewqq6jAMZ7sUhl7iMd3cFBf4/KSJzW4+pXs8Cw9ZXpY=
+github.com/panasasinc/minio-pkg v1.5.5-0.20230331124037-2837fe391278/go.mod h1:2MOaRFdmFKULD+uOLc3qHLGTQTuxCNPKNPfLBTxC8CA=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.9.3/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
 github.com/philhofer/fwd v1.1.1/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=
