@@ -923,7 +923,7 @@ func runMirror(ctx context.Context, cancelMirror context.CancelFunc, srcURL, dst
 				diffBucket := strings.TrimPrefix(d.SecondURL, dstClt.GetURL().String())
 				if isRemove {
 					aliasedDstBucket := path.Join(dstURL, diffBucket)
-					err := deleteBucket(ctx, aliasedDstBucket, false)
+					err := deleteBucket(ctx, aliasedDstBucket, false, false)
 					mj.status.fatalIf(err, "Failed to start mirroring.")
 				}
 				continue

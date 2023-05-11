@@ -20,6 +20,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/minio/minio-go/v7"
 	"path"
 	"path/filepath"
 	"strings"
@@ -28,7 +29,6 @@ import (
 	"github.com/minio/cli"
 	json "github.com/minio/colorjson"
 	"github.com/minio/mc/pkg/probe"
-	"github.com/minio/minio-go/v7"
 	"github.com/minio/pkg/console"
 )
 
@@ -40,6 +40,10 @@ var rbFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:  "dangerous",
 		Usage: "allow site-wide removal of objects",
+	},
+	cli.BoolFlag{
+		Name:  "keep",
+		Usage: "delete only bucket metadata - keep all objects and their metadata undeleted",
 	},
 }
 
@@ -103,6 +107,12 @@ func checkRbSyntax(ctx context.Context, cliCtx *cli.Context) {
 	// Set command flags from context.
 	isForce := cliCtx.Bool("force")
 	isDangerous := cliCtx.Bool("dangerous")
+	isKeep := cliCtx.Bool("keep")
+
+	if isKeep && isForce {
+		fatalIf(errDummy().Trace(),
+			"It is not allowed to combine --force and --keep flags.")
+	}
 
 	for _, url := range cliCtx.Args() {
 		if isS3NamespaceRemoval(ctx, url) {
@@ -110,7 +120,7 @@ func checkRbSyntax(ctx context.Context, cliCtx *cli.Context) {
 				continue
 			}
 			fatalIf(errDummy().Trace(),
-				"This operation results in **site-wide** removal of buckets. If you are really sure, retry this command with ‘--force’ and ‘--dangerous’ flags.")
+				"This operation results in **site-wide** removal of buckets. If you are really sure, retry this command with ‘--force’ and ‘--dangerous’ flags or use --keep to keep objects.")
 		}
 	}
 }
@@ -150,12 +160,18 @@ func listBucketsURLs(ctx context.Context, url string) ([]string, *probe.Error) {
 }
 
 // Delete a bucket and all its objects and versions will be removed as well.
-func deleteBucket(ctx context.Context, url string, isForce bool) *probe.Error {
+func deleteBucket(ctx context.Context, url string, isForce bool, isKeep bool) *probe.Error {
 	targetAlias, targetURL, _ := mustExpandAlias(url)
 	clnt, pErr := newClientFromAlias(targetAlias, targetURL)
 	if pErr != nil {
 		return pErr
 	}
+
+	// if keep flag is here - then skip listing and deleting objects
+	if isKeep {
+		return clnt.RemoveBucket(ctx, false)
+	}
+
 	contentCh := make(chan *ClientContent)
 	resultCh := clnt.Remove(ctx, false, false, false, false, contentCh)
 
@@ -232,6 +248,7 @@ func mainRemoveBucket(cliCtx *cli.Context) error {
 	// check 'rb' cli arguments.
 	checkRbSyntax(ctx, cliCtx)
 	isForce := cliCtx.Bool("force")
+	isKeep := cliCtx.Bool("keep")
 
 	// Additional command specific theme customization.
 	console.SetColor("RemoveBucket", color.New(color.FgGreen, color.Bold))
@@ -277,7 +294,7 @@ func mainRemoveBucket(cliCtx *cli.Context) error {
 		listCancel()
 
 		// For all recursive operations make sure to check for 'force' flag.
-		if !isForce && !isEmpty {
+		if !isForce && !isEmpty && !isKeep {
 			fatalIf(errDummy().Trace(), "`"+targetURL+"` is not empty. Retry this command with ‘--force’ flag if you want to remove `"+targetURL+"` and all its contents")
 		}
 
@@ -290,7 +307,7 @@ func mainRemoveBucket(cliCtx *cli.Context) error {
 		}
 
 		for _, bucketURL := range bucketsURL {
-			e := deleteBucket(ctx, bucketURL, isForce)
+			e := deleteBucket(ctx, bucketURL, isForce, isKeep)
 			fatalIf(e.Trace(bucketURL), "Failed to remove `"+bucketURL+"`.")
 
 			printMsg(removeBucketMessage{
