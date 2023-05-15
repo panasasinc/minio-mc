@@ -20,7 +20,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/minio/minio-go/v7"
 	"path"
 	"path/filepath"
 	"strings"
@@ -29,6 +28,7 @@ import (
 	"github.com/minio/cli"
 	json "github.com/minio/colorjson"
 	"github.com/minio/mc/pkg/probe"
+	"github.com/minio/minio-go/v7"
 	"github.com/minio/pkg/console"
 )
 
