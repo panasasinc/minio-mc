@@ -72,11 +72,17 @@ type groupMessage struct {
 func (u groupMessage) String() string {
 	switch u.op {
 	case "list":
-		var s []string
-		for _, g := range u.Groups {
-			s = append(s, console.Colorize("GroupMessage", g))
-		}
-		return strings.Join(s, "\n")
+		nameFieldMaxLen := 20
+		statusFieldMaxLen := 9
+		policyFieldMaxLen := 20
+		membersFieldMaxLen := 40
+
+		return newPrettyTable(" ",
+			Field{"GroupName", nameFieldMaxLen},
+			Field{"GroupStatus", statusFieldMaxLen},
+			Field{"GroupPolicy", policyFieldMaxLen},
+			Field{"GroupMembers", membersFieldMaxLen},
+		).buildRow(u.GroupName, u.GroupStatus, u.GroupPolicy, strings.Join(u.Members, ","))
 	case "disable":
 		return console.Colorize("GroupMessage", "Disabled group `"+u.GroupName+"` successfully.")
 	case "enable":

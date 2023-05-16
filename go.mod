@@ -121,4 +121,4 @@ replace github.com/minio/pkg => github.com/panasasinc/minio-pkg v1.5.5-0.2023033
 
 replace github.com/minio/minio-go/v7 v7.0.41 => github.com/panasasinc/minio-go/v7 v7.0.0-20221206164009-5985ee51debf
 
-replace github.com/minio/madmin-go => github.com/panasasinc/madmin-go v0.0.0-20230331061341-8fdaf3295741
+replace github.com/minio/madmin-go => github.com/panasasinc/madmin-go v1.6.7-0.20230524085333-532553a0f7e2
