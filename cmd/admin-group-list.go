@@ -58,6 +58,10 @@ func mainAdminGroupList(ctx *cli.Context) error {
 	checkAdminGroupListSyntax(ctx)
 
 	console.SetColor("GroupMessage", color.New(color.FgGreen))
+	console.SetColor("GroupName", color.New(color.FgBlue))
+	console.SetColor("GroupMembers", color.New(color.FgRed))
+	console.SetColor("GroupPolicy", color.New(color.FgYellow))
+	console.SetColor("GroupStatus", color.New(color.FgCyan))
 
 	// Get the alias parameter from cli
 	args := ctx.Args()
@@ -70,10 +74,15 @@ func mainAdminGroupList(ctx *cli.Context) error {
 	gs, e := client.ListGroups(globalContext)
 	fatalIf(probe.NewError(e).Trace(args...), "Unable to list groups")
 
-	printMsg(groupMessage{
-		op:     "list",
-		Groups: gs,
-	})
+	for _, groupDesc := range gs {
+		printMsg(groupMessage{
+			op:          "list",
+			GroupName:   groupDesc.Name,
+			Members:     groupDesc.Members,
+			GroupStatus: groupDesc.Status,
+			GroupPolicy: groupDesc.Policy,
+		})
+	}
 
 	return nil
 }
